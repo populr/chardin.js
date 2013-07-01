@@ -9,6 +9,29 @@
   -o-transition: all 0.3s ease-out;
   transition: all 0.3s ease-out; }
 
+.chardinjs-closebox {
+  position: absolute;
+  padding: 10px 20px;
+  border: 1px solid white;
+  color: white;
+  cursor: pointer; }
+
+.chardinjs-closebox-se {
+  bottom: 25px;
+  right: 25px; }
+
+.chardinjs-closebox-ne {
+  top: 25px;
+  right: 25px; }
+
+.chardinjs-closebox-nw {
+  top: 25px;
+  left: 25px; }
+
+.chardinjs-closebox-sw {
+  bottom: 25px;
+  left: 25px; }
+
 .chardinjs-helper-layer {
   position: absolute;
   z-index: 9999998;

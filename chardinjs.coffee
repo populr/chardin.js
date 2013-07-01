@@ -5,6 +5,8 @@ do ($ = window.jQuery, window) ->
     settings:
       opacity: 0.8
       disableZIndex: false
+      closeBoxMessage: 'Got it!'
+      closeBoxCorner: 'SE'
 
     constructor: (el, options) ->
       @settings = $.extend(@settings, options)
@@ -51,6 +53,10 @@ do ($ = window.jQuery, window) ->
     _add_overlay_layer: () ->
       return false if @._overlay_visible()
       overlay_layer = document.createElement("div")
+
+      if @settings.closeBoxMessage
+        overlay_layer.appendChild $("""<div class="chardinjs-closebox chardinjs-closebox-#{@settings.closeBoxCorner.toLowerCase()}">#{@settings.closeBoxMessage}</div>""")[0]
+
       styleText = ""
 
       overlay_layer.className = "chardinjs-overlay"
@@ -72,6 +78,7 @@ do ($ = window.jQuery, window) ->
         styleText += "opacity: #{@settings.opacity};opacity: #{@settings.opacity};-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=#{Math.round(100 * @settings.opacity)})';filter: alpha(opacity=#{Math.round(100 * @settings.opacity)});"
         overlay_layer.setAttribute "style", styleText
       , 10
+
 
     _get_position: (element) -> element.getAttribute('data-position') or 'bottom'
 

@@ -9,7 +9,9 @@
 
       chardinJs.prototype.settings = {
         opacity: 0.8,
-        disableZIndex: false
+        disableZIndex: false,
+        closeBoxMessage: 'Got it!',
+        closeBoxCorner: 'SE'
       };
 
       function chardinJs(el, options) {
@@ -86,6 +88,9 @@
           return false;
         }
         overlay_layer = document.createElement("div");
+        if (this.settings.closeBoxMessage) {
+          overlay_layer.appendChild($("<div class=\"chardinjs-closebox chardinjs-closebox-" + (this.settings.closeBoxCorner.toLowerCase()) + "\">" + this.settings.closeBoxMessage + "</div>")[0]);
+        }
         styleText = "";
         overlay_layer.className = "chardinjs-overlay";
         if (this.$el.prop('tagName') === "BODY") {
