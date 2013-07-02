@@ -101,9 +101,9 @@
           overlay_layer.width(element_position.width).height(element_position.height).css('top', "" + element_position.top + "px").css('left', "" + element_position.left + "px");
         }
         this.$el.append(overlay_layer);
-        overlay_layer.onclick = function() {
+        overlay_layer.click(function() {
           return _this.stop();
-        };
+        });
         return setTimeout(function() {
           var percentage_opacity;
           percentage_opacity = Math.round(100 * _this.settings.opacity);

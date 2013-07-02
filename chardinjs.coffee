@@ -85,7 +85,7 @@ do ($ = window.jQuery, window) ->
           .css('left', "#{element_position.left}px")
       @$el.append(overlay_layer)
 
-      overlay_layer.onclick = => @stop()
+      overlay_layer.click => @stop()
 
       setTimeout =>
         percentage_opacity = Math.round(100 * @settings.opacity)
