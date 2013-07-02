@@ -25,26 +25,35 @@
 
         var _this = this;
         this.settings = $.extend(this.settings, options);
-        this.$el = $(el);
+        this.$el = $(el).first();
         $(window).resize(function() {
           return _this.refresh();
         });
       }
 
       chardinJs.prototype.start = function() {
+        var close_box,
+          _this = this;
         if (this._overlay_visible()) {
           return false;
         }
         this._add_overlay_layer();
         this._call_function_on_chardin_elements(this._show_element);
+        if (this.settings.closeBoxMessage) {
+          close_box = $("<div class=\"chardinjs-closebox chardinjs-closebox-" + (this.settings.closeBoxCorner.toLowerCase()) + "\">" + this.settings.closeBoxMessage + "</div>");
+          close_box.click(function() {
+            return _this.stop();
+          });
+          this.$el.append(close_box);
+        }
         return this.$el.trigger('chardinJs:start');
       };
 
       chardinJs.prototype.toggle = function() {
-        if (!this._overlay_visible()) {
-          return this.start();
-        } else {
+        if (this._overlay_visible()) {
           return this.stop();
+        } else {
+          return this.start();
         }
       };
 
@@ -57,94 +66,87 @@
       };
 
       chardinJs.prototype.stop = function() {
-        this.$el.find(".chardinjs-overlay").fadeOut(function() {
+        this.$el.find('.chardinjs-overlay').fadeOut(function() {
           return $(this).remove();
         });
         this.$el.find('.chardinjs-helper-layer').remove();
+        this.$el.find('.chardinjs-closebox').remove();
         this.$el.find('.chardinjs-show-element').removeClass('chardinjs-show-element');
         this.$el.find('.chardinjs-relative-position').removeClass('chardinjs-relative-position');
         if (window.removeEventListener) {
-          window.removeEventListener("keydown", this._onKeyDown, true);
+          window.removeEventListener('keydown', this._onKeyDown, true);
         } else {
           if (document.detachEvent) {
-            document.detachEvent("onkeydown", this._onKeyDown);
+            document.detachEvent('onkeydown', this._onKeyDown);
           }
         }
         return this.$el.trigger('chardinJs:stop');
       };
 
       chardinJs.prototype._overlay_visible = function() {
-        return this.$el.find('.chardinjs-overlay').length !== 0;
+        return this.$el.find('.chardinjs-overlay').length;
       };
 
       chardinJs.prototype._add_overlay_layer = function() {
-        var element_position, overlay_layer, styleText,
+        var element_position, overlay_layer,
           _this = this;
         if (this._overlay_visible()) {
           return false;
         }
-        overlay_layer = document.createElement("div");
-        if (this.settings.closeBoxMessage) {
-          overlay_layer.appendChild($("<div class=\"chardinjs-closebox chardinjs-closebox-" + (this.settings.closeBoxCorner.toLowerCase()) + "\">" + this.settings.closeBoxMessage + "</div>")[0]);
-        }
-        styleText = "";
-        overlay_layer.className = "chardinjs-overlay";
-        if (this.$el.prop('tagName') === "BODY") {
-          styleText += "top: 0;bottom: 0; left: 0;right: 0;position: fixed;";
-          overlay_layer.setAttribute("style", styleText);
+        overlay_layer = $('<div class="chardinjs-overlay" />');
+        if (this.$el.is('body')) {
+          overlay_layer.css('top', 0).css('bottom', 0).css('left', 0).css('right', 0).css('position', 'fixed');
         } else {
-          element_position = this._get_offset(this.$el.get()[0]);
-          if (element_position) {
-            styleText += "width: " + element_position.width + "px; height:" + element_position.height + "px; top:" + element_position.top + "px;left: " + element_position.left + "px;";
-            overlay_layer.setAttribute("style", styleText);
-          }
+          element_position = this._get_offset(this.$el);
+          overlay_layer.width(element_position.width).height(element_position.height).css('top', "" + element_position.top + "px").css('left', "" + element_position.left + "px");
         }
-        this.$el.get()[0].appendChild(overlay_layer);
+        this.$el.append(overlay_layer);
         overlay_layer.onclick = function() {
           return _this.stop();
         };
         return setTimeout(function() {
-          styleText += "opacity: " + _this.settings.opacity + ";opacity: " + _this.settings.opacity + ";-ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=" + (Math.round(100 * _this.settings.opacity)) + ")';filter: alpha(opacity=" + (Math.round(100 * _this.settings.opacity)) + ");";
-          return overlay_layer.setAttribute("style", styleText);
+          var percentage_opacity;
+          percentage_opacity = Math.round(100 * _this.settings.opacity);
+          return overlay_layer.css('opacity', _this.settings.opacity).css('-ms-filter', "progid:DXImageTransform.Microsoft.Alpha(Opacity=" + percentage_opacity + ")").css('filter', "alpha(opacity=" + percentage_opacity + ")");
         }, 10);
       };
 
       chardinJs.prototype._get_position = function(element) {
-        return element.getAttribute('data-position') || 'bottom';
+        return element.attr('data-position') || 'bottom';
       };
 
       chardinJs.prototype._place_tooltip = function(element) {
         var my_height, my_width, target_element_position, target_height, target_width, tooltip_layer, tooltip_layer_position;
-        tooltip_layer = $(element).data('tooltip_layer');
+        tooltip_layer = element.data('tooltip_layer');
         tooltip_layer_position = this._get_offset(tooltip_layer);
-        tooltip_layer.style.top = null;
-        tooltip_layer.style.right = null;
-        tooltip_layer.style.bottom = null;
-        tooltip_layer.style.left = null;
+        tooltip_layer.css('top', '');
+        tooltip_layer.css('right', '');
+        tooltip_layer.css('bottom', '');
+        tooltip_layer.css('left', '');
         switch (this._get_position(element)) {
-          case "top":
-          case "bottom":
+          case 'top':
+          case 'bottom':
             target_element_position = this._get_offset(element);
             target_width = target_element_position.width;
-            my_width = $(tooltip_layer).width();
-            tooltip_layer.style.left = "" + ((target_width / 2) - (tooltip_layer_position.width / 2)) + "px";
+            my_width = tooltip_layer.width();
+            tooltip_layer.css('left', "" + ((target_width / 2) - (tooltip_layer_position.width / 2)) + "px");
             break;
-          case "left":
-          case "right":
+          case 'left':
+          case 'right':
             target_element_position = this._get_offset(element);
             target_height = target_element_position.height;
-            my_height = $(tooltip_layer).height();
-            tooltip_layer.style.top = "" + ((target_height / 2) - (tooltip_layer_position.height / 2)) + "px";
+            my_height = tooltip_layer.height();
+            tooltip_layer.css('top', "" + ((target_height / 2) - (tooltip_layer_position.height / 2)) + "px");
         }
         switch (this._get_position(element)) {
-          case "left":
-            return tooltip_layer.style.left = "-" + (tooltip_layer_position.width - 34) + "px";
-          case "right":
-            return tooltip_layer.style.right = "-" + (tooltip_layer_position.width - 34) + "px";
-          case "bottom":
-            return tooltip_layer.style.bottom = "-" + tooltip_layer_position.height + "px";
-          case "top":
-            return tooltip_layer.style.top = "-" + tooltip_layer_position.height + "px";
+          case 'left':
+            return tooltip_layer.css('left', "-" + (tooltip_layer_position.width - 34) + "px");
+          case 'right':
+            return tooltip_layer.css('right', "-" + (tooltip_layer_position.width - 34) + "px");
+          case 'bottom':
+            return tooltip_layer.css('bottom', "-" + tooltip_layer_position.height + "px");
+          case 'top':
+            return tooltip_layer.css('top', "-" + tooltip_layer_position.height + "px");
         }
       };
 
@@ -153,9 +155,9 @@
         if (yOffset == null) {
           yOffset = 0;
         }
-        helper_layer = $(element).data('helper_layer');
+        helper_layer = element.data('helper_layer');
         element_position = this._get_offset(element, yOffset);
-        return helper_layer.setAttribute("style", "width: " + element_position.width + "px; height:" + element_position.height + "px; top:" + element_position.top + "px; left: " + element_position.left + "px;");
+        return helper_layer.width(element_position.width).height(element_position.height).css('top', "" + element_position.top + "px").css('left', "" + element_position.left + "px");
       };
 
       chardinJs.prototype._show_element = function(element, yOffset) {
@@ -164,55 +166,35 @@
           yOffset = 0;
         }
         element_position = this._get_offset(element, yOffset);
-        helper_layer = document.createElement("div");
-        tooltip_layer = document.createElement("div");
-        $(element).data('helper_layer', helper_layer).data('tooltip_layer', tooltip_layer);
+        tooltip_layer = $("<div class=\"chardinjs-tooltip chardinjs-" + (this._get_position(element)) + "\"><div class=\"chardinjs-tooltiptext\">" + (element.attr('data-intro')) + "</div></div>");
+        helper_layer = $("<div class=\"chardinjs-helper-layer chardinjs-" + (this._get_position(element)) + "\" />");
         if (element.id) {
-          helper_layer.setAttribute("data-id", element.id);
+          helper_layer.data('id', element.id);
         }
-        helper_layer.className = "chardinjs-helper-layer chardinjs-" + (this._get_position(element));
+        helper_layer.append(tooltip_layer);
+        element.data('helper_layer', helper_layer).data('tooltip_layer', tooltip_layer);
         this._position_helper_layer(element, yOffset);
-        this.$el.get()[0].appendChild(helper_layer);
-        tooltip_layer.className = "chardinjs-tooltip chardinjs-" + (this._get_position(element));
-        tooltip_layer.innerHTML = "<div class='chardinjs-tooltiptext'>" + (element.getAttribute('data-intro')) + "</div>";
-        helper_layer.appendChild(tooltip_layer);
+        this.$el.append(helper_layer);
         this._place_tooltip(element);
         if (!this.settings.disableZIndex) {
-          element.className += " chardinjs-show-element";
+          element.addClass('chardinjs-show-element');
         }
-        current_element_position = "";
-        if (element.currentStyle) {
-          current_element_position = element.currentStyle["position"];
-        } else {
-          if (document.defaultView && document.defaultView.getComputedStyle) {
-            current_element_position = document.defaultView.getComputedStyle(element, null).getPropertyValue("position");
-          }
-        }
-        current_element_position = current_element_position.toLowerCase();
-        if (current_element_position !== "absolute" && current_element_position !== "relative") {
-          return element.className += " chardinjs-relative-position";
+        current_element_position = element.css('position').toLowerCase();
+        if (current_element_position !== 'absolute' && current_element_position !== 'relative') {
+          return element.addClass('chardinjs-relative-position');
         }
       };
 
       chardinJs.prototype._get_offset = function(element, yOffset) {
-        var element_position, _x, _y;
         if (yOffset == null) {
           yOffset = 0;
         }
-        element_position = {
-          width: element.offsetWidth,
-          height: element.offsetHeight
+        return {
+          left: element.offset().left,
+          top: element.offset().top + yOffset,
+          width: element.outerWidth(),
+          height: element.outerHeight()
         };
-        _x = 0;
-        _y = 0;
-        while (element && !isNaN(element.offsetLeft) && !isNaN(element.offsetTop)) {
-          _x += element.offsetLeft;
-          _y += element.offsetTop;
-          element = element.offsetParent;
-        }
-        element_position.top = _y + yOffset;
-        element_position.left = _x;
-        return element_position;
       };
 
       chardinJs.prototype._call_function_on_chardin_elements = function(fn) {
@@ -221,7 +203,7 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           el = _ref[_i];
           if ($(el).is(':visible')) {
-            fn(el);
+            fn($(el));
           }
         }
         if (this.settings.iframeSelector) {
@@ -236,7 +218,7 @@
               for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
                 el = _ref2[_k];
                 if ($(el).is(':visible')) {
-                  _results1.push(fn(el, $(iframe).offset().top));
+                  _results1.push(fn($(el), $(iframe).offset().top));
                 } else {
                   _results1.push(void 0);
                 }
