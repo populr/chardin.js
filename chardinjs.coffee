@@ -7,6 +7,7 @@ do ($ = window.jQuery, window) ->
       disableZIndex: false
       closeBoxMessage: 'Got it!'
       closeBoxCorner: 'SE'
+      iframeSelector: null
 
     constructor: (el, options) ->
       @settings = $.extend(@settings, options)
@@ -167,9 +168,10 @@ do ($ = window.jQuery, window) ->
       for el in @$el.find('*[data-intro]')
         fn(el) if $(el).is(':visible')
 
-      for iframe in @$el.find('iframe')
-        for el in $(iframe.contentWindow.document || iframe.contentDocument).find('*[data-intro]')
-          fn(el, $(iframe).offset().top) if $(el).is(':visible')
+      if @settings.iframeSelector
+        for iframe in @$el.find(@settings.iframeSelector)
+          for el in $(iframe.contentWindow.document || iframe.contentDocument).find('*[data-intro]')
+            fn(el, $(iframe).offset().top) if $(el).is(':visible')
 
 
   $.fn.extend chardinJs: (command, options={}) ->

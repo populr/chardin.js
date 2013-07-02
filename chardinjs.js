@@ -12,7 +12,8 @@
         opacity: 0.8,
         disableZIndex: false,
         closeBoxMessage: 'Got it!',
-        closeBoxCorner: 'SE'
+        closeBoxCorner: 'SE',
+        iframeSelector: null
       };
 
       function chardinJs(el, options) {
@@ -223,26 +224,28 @@
             fn(el);
           }
         }
-        _ref1 = this.$el.find('iframe');
-        _results = [];
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          iframe = _ref1[_j];
-          _results.push((function() {
-            var _k, _len2, _ref2, _results1;
-            _ref2 = $(iframe.contentWindow.document || iframe.contentDocument).find('*[data-intro]');
-            _results1 = [];
-            for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-              el = _ref2[_k];
-              if ($(el).is(':visible')) {
-                _results1.push(fn(el, $(iframe).offset().top));
-              } else {
-                _results1.push(void 0);
+        if (this.settings.iframeSelector) {
+          _ref1 = this.$el.find(this.settings.iframeSelector);
+          _results = [];
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            iframe = _ref1[_j];
+            _results.push((function() {
+              var _k, _len2, _ref2, _results1;
+              _ref2 = $(iframe.contentWindow.document || iframe.contentDocument).find('*[data-intro]');
+              _results1 = [];
+              for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+                el = _ref2[_k];
+                if ($(el).is(':visible')) {
+                  _results1.push(fn(el, $(iframe).offset().top));
+                } else {
+                  _results1.push(void 0);
+                }
               }
-            }
-            return _results1;
-          })());
+              return _results1;
+            })());
+          }
+          return _results;
         }
-        return _results;
       };
 
       return chardinJs;
