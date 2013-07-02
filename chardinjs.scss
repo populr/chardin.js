@@ -15,12 +15,23 @@
 }
 
 .chardinjs-closebox {
-  position: absolute;
-  padding: 10px 20px;
   border: 1px solid white;
   color: white;
   cursor: pointer;
+  font-weight: bold;
+  padding: 10px 20px;
+  position: absolute;
+  z-index: 9999998;
+  background: rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  &:active {
+    background: rgba(0, 0, 0, 0.1);
+  }
 }
+
 .chardinjs-closebox-se {
   bottom: 25px;
   right: 25px;
