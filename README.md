@@ -1,5 +1,7 @@
 # Chardin.js
 
+## modified opacity of the overlay to fix rendering issue, so customizable opacities no longer work
+
 **Simple overlay instructions for your apps.**
 
 [Check out a demo](http://heelhook.github.com/chardin.js/).

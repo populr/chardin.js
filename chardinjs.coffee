@@ -138,8 +138,8 @@ do ($ = window.jQuery, window) ->
       helper_layer
         .width(element_position.width)
         .height(element_position.height)
-        .css('top', "#{element_position.top}px")
-        .css('left', "#{element_position.left}px")
+        .css('top', "#{Math.round(element_position.top)}px")
+        .css('left', "#{Math.round(element_position.left)}px")
 
 
     _show_element: (element, yOffset=0) =>
